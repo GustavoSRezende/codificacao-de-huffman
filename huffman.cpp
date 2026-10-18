@@ -108,7 +108,7 @@ int main() {
     cout << "==================================================\n";
     cout << "TESTE 1: PEQUENA INSTANCIA (Demonstracao)\n";
     cout << "==================================================";
-    string teste1 = "TESTE"; //pequena instancia
+    string teste1 = "ALGORITMOS"; //pequena instancia
     
     auto inicio1 = chrono::high_resolution_clock::now();
     executarHuffman(teste1, true); 
@@ -138,14 +138,14 @@ int main() {
 
     if (arquivo.is_open()) {
         stringstream buffer;
-        buffer << arquivo.rdbuf(); // Joga todo o conteúdo do arquivo no buffer
-        teste3 = buffer.str();     // Converte o buffer para a nossa string padrão
+        buffer << arquivo.rdbuf(); //joga todo o conteúdo do arquivo no buffer
+        teste3 = buffer.str();     //converte o buffer para a nossa string padrão
         arquivo.close();
         cout << "Arquivo lido com sucesso! Tamanho: " << teste3.length() << " caracteres.\n";
     } else {
         cout << "ERRO: O arquivo 'texto_gigante.txt' nao foi encontrado.\n";
         cout << "Crie um arquivo com esse nome na mesma pasta do terminal.\n";
-        return 1; // Encerra o programa se não achar o arquivo
+        return 1; //encerra o programa se não achar o arquivo
     }
     
     auto inicio3 = chrono::high_resolution_clock::now(); //registro do tempo inicial
