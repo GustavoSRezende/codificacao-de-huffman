@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <vector>
 #include <chrono>
+#include <fstream>  
+#include <sstream>
 
 using namespace std;
 
@@ -87,12 +89,13 @@ void executarHuffman(const string& texto, bool mostrarPassos = false) {
         cout << "'" << par.first << "' : " << par.second << " (Freq: " << frequencias[par.first] << ")\n";
     }
 
-    cout << "\nTexto Original (" << texto.length() * 8 << " bits): " << texto << "\n"; //mostra o tamanho do texto original em bits, considerando que cada caractere ocupa 8 bits
+    bool imprimirTexto = texto.length() <= 200; //se o texto for muito grande, nao imprime o texto original nem o codificado para nao poluir a tela
+    cout << "\nTexto Original (" << texto.length() * 8 << " bits)" << (imprimirTexto ? ": " + texto : " [texto muito grande, nao exibido]") << "\n"; //mostra o tamanho do texto original em bits, considerando que cada caractere ocupa 8 bits
     
-    cout << "Texto Codificado: "; //mostra o texto codificado, percorrendo cada caractere do texto original e substituindo pelo código correspondente no dicionarioCodigos
+    cout << "Texto Codificado: " << (imprimirTexto ? "" : "[texto muito grande, nao exibido]"); //mostra o texto codificado, percorrendo cada caractere do texto original e substituindo pelo código correspondente no dicionarioCodigos
     int bitsComprimidos = 0;
     for (char ch : texto) {
-        cout << dicionarioCodigos[ch] << " ";
+        if (imprimirTexto) cout << dicionarioCodigos[ch] << " ";
         bitsComprimidos += dicionarioCodigos[ch].length(); //soma o tamanho do codigo correspondente ao caractere, para calcular o tamanho total do texto comprimido em bits
     }                                                      //por exemplo se T corresponde a 10, ele soma 2 bits
     cout << "\nTamanho Apos Compressao: " << bitsComprimidos << " bits\n"; //mostra o tamanho do texto comprimido em bits, que é a soma dos tamanhos dos códigos correspondentes a cada caractere do texto original
@@ -106,33 +109,53 @@ int main() {
     cout << "TESTE 1: PEQUENA INSTANCIA (Demonstracao)\n";
     cout << "==================================================";
     string teste1 = "TESTE"; //pequena instancia
+    
+    auto inicio1 = chrono::high_resolution_clock::now();
     executarHuffman(teste1, true); 
+    auto fim1 = chrono::high_resolution_clock::now(); //registro do tempo final depois da execução do algoritmo
+    auto duracao1 = chrono::duration_cast<chrono::milliseconds>(fim1 - inicio1); //calcula a duração da execução do algoritmo em milissegundos
+
+    cout << "Tempo de Execucao (Teste 1): " << duracao1.count() << " milissegundos\n"; //imprime o tempo de execução do algoritmo para a pequena instância
 
     cout << "\n==================================================\n";
     cout << "TESTE 2: MEDIA INSTANCIA\n";
     cout << "==================================================";
     string teste2 = "ESTRUTURAS DE DADOS E ALGORITMOS GULOSOS"; //media instancia
+
+    auto inicio2 = chrono::high_resolution_clock::now();
     executarHuffman(teste2, false);
+    auto fim2 = chrono::high_resolution_clock::now(); //registro do tempo final depois da execução do algoritmo
+    auto duracao2 = chrono::duration_cast<chrono::milliseconds>(fim2 - inicio2); //calcula a duração da execução do algoritmo em milissegundos
+
+    cout << "Tempo de Execucao (Teste 2): " << duracao2.count() << " milissegundos\n"; //imprime o tempo de execução do algoritmo para a média instância
 
     cout << "\n==================================================\n";
     cout << "TESTE 3: GRANDE INSTANCIA (Eficiencia)\n";
     cout << "==================================================\n";
-    string teste3 = "Em ciencia da computacao, a codificacao de Huffman e um algoritmo guloso " //grande instancia
-                "utilizado para a compressao de dados sem perdas. A estrategia principal "
-                "consiste em analisar a frequencia de cada caractere presente na entrada e "
-                "atribuir codigos binarios de tamanho variavel a cada um deles. "
-                "As letras que aparecem com maior frequencia recebem os codigos mais curtos, "
-                "enquanto as letras mais raras recebem codigos mais longos, reduzindo "
-                "drasticamente o tamanho final do arquivo processado na memoria.";
+
+    ifstream arquivo("texto_gigante.txt");
+    string teste3; 
+
+    if (arquivo.is_open()) {
+        stringstream buffer;
+        buffer << arquivo.rdbuf(); // Joga todo o conteúdo do arquivo no buffer
+        teste3 = buffer.str();     // Converte o buffer para a nossa string padrão
+        arquivo.close();
+        cout << "Arquivo lido com sucesso! Tamanho: " << teste3.length() << " caracteres.\n";
+    } else {
+        cout << "ERRO: O arquivo 'texto_gigante.txt' nao foi encontrado.\n";
+        cout << "Crie um arquivo com esse nome na mesma pasta do terminal.\n";
+        return 1; // Encerra o programa se não achar o arquivo
+    }
     
-    auto inicio = chrono::high_resolution_clock::now(); //registro do tempo inicial
+    auto inicio3 = chrono::high_resolution_clock::now(); //registro do tempo inicial
     
     executarHuffman(teste3, false);
     
-    auto fim = chrono::high_resolution_clock::now(); //registro do tempo final depois da execução do algoritmo
-    auto duracao = chrono::duration_cast<chrono::milliseconds>(fim - inicio); //calcula a duração da execução do algoritmo em milissegundos
+    auto fim3 = chrono::high_resolution_clock::now(); //registro do tempo final depois da execução do algoritmo
+    auto duracao3 = chrono::duration_cast<chrono::milliseconds>(fim3 - inicio3); //calcula a duração da execução do algoritmo em milissegundos
     
-    cout << "Tempo de Execucao (Teste 3): " << duracao.count() << " milissegundos\n"; //imprime o tempo de execução do algoritmo para a grande instância
+    cout << "Tempo de Execucao (Teste 3): " << duracao3.count() << " milissegundos\n"; //imprime o tempo de execução do algoritmo para a grande instância
     cout << "==================================================\n"; 
 
     return 0;
